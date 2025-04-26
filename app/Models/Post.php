@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\updatePostCount;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -15,5 +16,14 @@ class Post extends Model
 
     public function user(){
         return $this->belongsTo('App\Models\User');
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($post) {
+            event(new updatePostCount($post));
+        });
     }
 }

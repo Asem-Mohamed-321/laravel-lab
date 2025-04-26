@@ -8,6 +8,8 @@
     <title>@yield('title')</title>
 </head>
 <body>
+<p class=" bg-red-700">The quick brown fox...</p>
+
     <div>
         @section('navbar')
             @include('includes.navbar')

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
@@ -37,7 +38,7 @@ class PostController extends Controller
         //
 
         Post::create(
-            ['title' => $request->title , 'body' => $request->body , 'enabled' => 1 ,'user_id' => $request->user_id]
+            ['title' => $request->title , 'body' => $request->body , 'enabled' => 1 ,'user_id' => Auth::id()]
             );
         return redirect()->route('posts.index');
     }
@@ -58,7 +59,14 @@ class PostController extends Controller
     public function edit(string $id)
     {
         //
-        return view("posts.edit",['id'=>$id]);
+        $post = Post::find($id);
+        //check that its the auth user 
+        if (Auth::id() !== $post->user_id) {
+            abort(403, 'You are not authorized to edit this post.');
+        }
+
+        
+        return view("posts.edit",['post'=>$post]);
     }
 
     /**
@@ -67,7 +75,8 @@ class PostController extends Controller
     public function update(Request $request, string $id)
     {
         //
-        return "<h2>Update the specified resource with id $id in storage.</h2>";
+        Post::find($id)->update(['title' => $request->title , 'body' => $request->body , 'enabled' => 1 ,'user_id' => Auth::id()]);
+        return redirect()->route('posts.index');
 
     }
 
